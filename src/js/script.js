@@ -93,7 +93,7 @@
       thisProduct.initAmountWidget();
       thisProduct.processOrder();
   
-      console.log('new Product: ', thisProduct);
+      //console.log('new Product: ', thisProduct);
     }
   
     renderInMenu() {
@@ -292,8 +292,8 @@
     constructor(element){
       const thisWidget = this;
 
-      console.log('AmountWidget: ', thisWidget);
-      console.log('Constructor arguments: ', element);
+      //console.log('AmountWidget: ', thisWidget);
+      //console.log('Constructor arguments: ', element);
 
       thisWidget.getElements(element);
 
@@ -358,7 +358,9 @@
     announce(){
       const thisWidget = this;
 
-      const event = new Event('updated');
+      const event = new CustomEvent('updated', {
+        bubbles:true
+      });
       thisWidget.element.dispatchEvent(event);
     }
   }
@@ -371,29 +373,61 @@
       
       thisCart.getElements(element);
       thisCart.initActions();
+      thisCart.update();
 
-      console.log('new Cart: ', thisCart);
+      //console.log('new Cart: ', thisCart);
     }
 
     getElements(element){
       const thisCart = this;
-
+    
       thisCart.dom = {};
       thisCart.dom.wrapper = element;
       thisCart.dom.toggleTrigger = thisCart.dom.wrapper.querySelector(select.cart.toggleTrigger);
       thisCart.dom.productList = thisCart.dom.wrapper.querySelector(select.cart.productList);
+      thisCart.dom.deliveryFee = thisCart.dom.wrapper.querySelector(select.cart.deliveryFee);
+      thisCart.dom.subtotalPrice = thisCart.dom.wrapper.querySelector(select.cart.subtotalPrice);
+      thisCart.dom.totalPrice = thisCart.dom.wrapper.querySelectorAll(select.cart.totalPrice);
+      thisCart.dom.totalNumber = thisCart.dom.wrapper.querySelector(`.${select.cart.totalNumber}`);
     }
 
     initActions() {
       const thisCart = this;
-  
-      // Listener na kliknięcie toggleTrigger
+    
+      // Nasłuchiwacz na kliknięcie toggleTrigger
       thisCart.dom.toggleTrigger.addEventListener('click', function () {
         // Przełączanie klasy wrapperActive na koszyku
         thisCart.dom.wrapper.classList.toggle(classNames.cart.wrapperActive);
       });
+    
+      // Nasłuchiwacz na event 'updated' w produkcie
+      thisCart.dom.productList.addEventListener('updated', function () {
+        thisCart.update();
+      });
+    
+      // Nasłuchiwacz na event 'remove' w produkcie
+      thisCart.dom.productList.addEventListener('remove', function (event) {
+        // Przekazanie do metody thisCart.remove produktu, który ma zostać usunięty
+        thisCart.remove(event.detail.cartProduct);
+      });
     }
 
+    remove(cartProduct) {
+      const thisCart = this;
+    
+      // 1. Usuwamy reprezentację produktu z HTML-a
+      cartProduct.dom.wrapper.remove();
+    
+      // 2. Usuwamy produkt z tablicy thisCart.products
+      const index = thisCart.products.indexOf(cartProduct);
+      if (index !== -1) {
+        thisCart.products.splice(index, 1);
+      }
+    
+      // 3. Wywołujemy metodę update w celu przeliczenia sum
+      thisCart.update();
+    }
+    
     add(menuProduct){
       const thisCart = this;
     
@@ -407,12 +441,154 @@
       thisCart.dom.productList.appendChild(generatedDOM);
     
       // Dodanie produktu do tablicy thisCart.products
-      thisCart.products.push(menuProduct);
+      thisCart.products.push(new CartProduct(menuProduct, generatedDOM));
     
-      console.log('Added to cart:', thisCart.products);
+      //console.log('Added to cart:', thisCart.products);
+
+      // Zaktualizowanie sum koszyka
+      thisCart.update();
     }
+
+    update() {
+      const thisCart = this;
+    
+      let deliveryFee = settings.cart.defaultDeliveryFee;
+      let totalNumber = 0;
+      let subtotalPrice = 0;
+    
+      // Przejście po wszystkich produktach w koszyku
+      for (const product of thisCart.products) {
+        totalNumber += product.amount;
+        subtotalPrice += product.price;
+      }
+    
+      // Obliczanie całkowitej ceny
+      if (totalNumber > 0) {
+        thisCart.totalPrice = subtotalPrice + deliveryFee;
+        //zmiana z getelementbyId bo nie mam pojęcia 
+        document.getElementById('delivery').innerHTML = deliveryFee;
+      } else {
+        thisCart.totalPrice = 0; // Jeśli koszyk jest pusty, cena całkowita to 0
+        document.getElementById('delivery').innerHTML = 0;
+      }
+    
+      // Zaktualizowanie danych w HTML
+      thisCart.dom.totalNumber.innerHTML = totalNumber;
+    
+      // Zaktualizowanie subtotala nie działa
+      //thisCart.dom.subtotalPrice.innerHTML = subtotalPrice;
+
+    
+      // Zaktualizowanie kosztu dostawy nie działa
+      //  thisCart.dom.deliveryFee.innerHTML = deliveryFee;
+    
+      // Zaktualizowanie całkowitej ceny (TOTAL U GÓRY A NIE NA DOLE)
+      for (const totalPriceElem of thisCart.dom.totalPrice) {
+        totalPriceElem.innerHTML = thisCart.totalPrice;
+      }
+      
+      // zmiany z getelementbyId bo nie mam pojęcia 
+      document.getElementById('subtotal').innerHTML = subtotalPrice;
+      
+      document.getElementById('total').innerHTML = thisCart.totalPrice;
+      console.log("Total number of products: " + totalNumber);
+      console.log("Subtotal price: " + subtotalPrice);
+      console.log("Total price: " + thisCart.totalPrice);
+    }
+    
   }
 
+  class CartProduct {
+    constructor(menuProduct, element) {
+      const thisCartProduct = this;
+  
+      // Przypisanie obiektu menuProduct do instancji thisCartProduct
+      thisCartProduct.id = menuProduct.id;
+      thisCartProduct.name = menuProduct.name;
+      thisCartProduct.amount = menuProduct.amount;
+      thisCartProduct.priceSingle = menuProduct.priceSingle;
+      thisCartProduct.price = menuProduct.price;
+      thisCartProduct.params = menuProduct.params;
+  
+      // Wywołanie metody getElements
+      thisCartProduct.getElements(element);
+
+      // Inicjalizacja widgetu ilości
+      thisCartProduct.initAmountWidget();
+      
+      thisCartProduct.initActions();
+
+      // Wyświetlenie instancji w konsoli
+      //console.log('New CartProduct:', thisCartProduct);
+    }
+  
+    getElements(element) {
+      const thisCartProduct = this;
+  
+      // Tworzenie pustego obiektu dom
+      thisCartProduct.dom = {};
+  
+      // Przypisanie elementu DOM
+      thisCartProduct.dom.wrapper = element;
+  
+      // Wyszukanie elementów we wrapperze
+      thisCartProduct.dom.amountWidget = thisCartProduct.dom.wrapper.querySelector(select.CartProduct.amountWidget);
+      thisCartProduct.dom.price = thisCartProduct.dom.wrapper.querySelector(select.CartProduct.price);
+      thisCartProduct.dom.edit = thisCartProduct.dom.wrapper.querySelector(select.CartProduct.edit);
+      thisCartProduct.dom.remove = thisCartProduct.dom.wrapper.querySelector(select.CartProduct.remove);
+    }
+
+    initAmountWidget() {
+      const thisCartProduct = this;
+  
+      // Tworzenie instancji AmountWidget
+      thisCartProduct.amountWidget = new AmountWidget(thisCartProduct.dom.amountWidget);
+  
+      // Nasłuchiwacz zmiany wartości widgetu
+      thisCartProduct.dom.amountWidget.addEventListener('updated', function () {
+        // Aktualizacja wartości ilości
+        thisCartProduct.amount = thisCartProduct.amountWidget.value;
+  
+        // Aktualizacja ceny
+        thisCartProduct.price = thisCartProduct.amount * thisCartProduct.priceSingle;
+  
+        // Aktualizacja widoku ceny w interfejsie
+        thisCartProduct.dom.price.innerHTML = thisCartProduct.price;
+      });
+    }
+
+    remove(){
+      const thisCartProduct = this;
+
+      const event = new CustomEvent('remove', {
+        bubbles: true,
+        detail: {
+          cartProduct: thisCartProduct,
+        },
+      });
+
+      thisCartProduct.dom.wrapper.dispatchEvent(event);
+    }
+
+    initActions() {
+      const thisCartProduct = this;
+    
+      // Nasłuchiwacz na kliknięcie przycisku "edit" - na razie nic nie robi
+      thisCartProduct.dom.edit.addEventListener('click', function (event) {
+        event.preventDefault();
+        console.log('Edit button clicked');
+        // Tu możemy później dodać logikę edytowania produktu w koszyku
+      });
+    
+      // Nasłuchiwacz na kliknięcie przycisku "remove"
+      thisCartProduct.dom.remove.addEventListener('click', function (event) {
+        event.preventDefault();
+        console.log('Remove button clicked');
+        // Wywołanie metody remove(), aby wyemitować zdarzenie i usunąć produkt
+        thisCartProduct.remove();
+      });
+    }
+  }
   const app = {
       
     initMenu: function(){
