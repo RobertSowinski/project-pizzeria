@@ -93,6 +93,7 @@
         thisProduct.formInputs = thisProduct.form.querySelectorAll(select.all.formInputs);
         thisProduct.cartButton = thisProduct.element.querySelector(select.menuProduct.cartButton);
         thisProduct.priceElem = thisProduct.element.querySelector(select.menuProduct.priceElem);
+        thisProduct.imageWrapper = thisProduct.element.querySelector(select.menuProduct.imageWrapper);
       }
 
       initAccordion() {
@@ -167,11 +168,25 @@
                 // add option price to price variable
                 price += option.price;
               }
+
+               // add 'active' class to the corresponding image
+              const imageClass = `${paramId}-${optionId}`; // np. 'toppings-olives' lub 'ingredients-olives'
+              const imageElement = thisProduct.imageWrapper.querySelector(`.${imageClass}`);
+              if (imageElement) {
+                imageElement.classList.add(classNames.menuProduct.imageVisible);
+              }
             } else {
               // check if the option is default
               if (option.default) {
                 // reduce price variable
                 price -= option.price;
+              }
+
+              // remove 'active' class from the corresponding image
+              const imageClass = `${paramId}-${optionId}`; // np. 'toppings-olives' lub 'ingredients-olives'
+              const imageElement = thisProduct.imageWrapper.querySelector(`.${imageClass}`);
+              if (imageElement) {
+                imageElement.classList.remove(classNames.menuProduct.imageVisible);
               }
             }
           }
