@@ -1,5 +1,6 @@
 /* global Handlebars, utils, dataSource */ // eslint-disable-line no-unused-vars
 
+
 {
   'use strict';
   
@@ -70,6 +71,11 @@
     },
     cart: {
       defaultDeliveryFee: 20,
+    },
+    db: {
+      url: '//localhost:3131',
+      products: 'products',
+      orders: 'orders',
     },
   };
   
@@ -389,6 +395,10 @@
       thisCart.dom.subtotalPrice = thisCart.dom.wrapper.querySelector(select.cart.subtotalPrice);
       thisCart.dom.totalPrice = thisCart.dom.wrapper.querySelectorAll(select.cart.totalPrice);
       thisCart.dom.totalNumber = thisCart.dom.wrapper.querySelector(`.${select.cart.totalNumber}`);
+      thisCart.dom.form = thisCart.dom.wrapper.querySelector(select.cart.form);
+      thisCart.dom.address = thisCart.dom.form.querySelector(select.cart.address);
+      thisCart.dom.phone = thisCart.dom.form.querySelector(select.cart.phone);
+  
     }
 
     initActions() {
@@ -410,6 +420,52 @@
         // Przekazanie do metody thisCart.remove produktu, który ma zostać usunięty
         thisCart.remove(event.detail.cartProduct);
       });
+
+      // Nasłuchiwacz na event 'submit' w produkcie
+      thisCart.dom.form.addEventListener('submit', function (event) {
+        // Przekazanie do metody thisCart.remove produktu, który ma zostać usunięty
+        event.preventDefault();
+        thisCart.sendOrder();
+      });
+    }
+
+    sendOrder(){
+      const thisCart = this;
+
+      const url = settings.db.url + '/' + settings.db.orders;
+
+      // Pobieranie wartości z koszyka
+      const payload = {
+        address: thisCart.dom.address.value, // Adres z formularza
+        phone: thisCart.dom.phone.value, // Telefon z formularza
+        totalPrice: thisCart.totalPrice,
+        subtotalPrice: thisCart.subtotalPrice,
+        totalNumber: thisCart.totalNumber,
+        deliveryFee: thisCart.deliveryFee,
+        products: [] // Tymczasowo pusta tablica
+      };
+      // Zapełnianie payload.products przy użyciu metody getData
+      for (let prod of thisCart.products) {
+        payload.products.push(prod.getData()); // Dodanie podsumowania produktu
+      }
+
+      console.log("Payload:", payload);
+
+      // Wysłanie zamówienia do API
+      const options = {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload),
+      };
+      
+      fetch(url, options)
+        .then(function(response){
+          return response.json();
+        }).then(function(parsedResponse){
+          console.log('parsedResponse: ', parsedResponse);
+        });
     }
 
     remove(cartProduct) {
@@ -461,41 +517,36 @@
         totalNumber += product.amount;
         subtotalPrice += product.price;
       }
-    
+
+      // Zapisanie nowych wartości do obiektu thisCart
+      thisCart.totalNumber = totalNumber; // Zapisanie totalNumber
+      thisCart.subtotalPrice = subtotalPrice; // Zapisanie subtotalPrice
+      thisCart.deliveryFee = totalNumber > 0 ? deliveryFee : 0; // Zapisanie deliveryFee, jeśli są produkty
+      
       // Obliczanie całkowitej ceny
       if (totalNumber > 0) {
         thisCart.totalPrice = subtotalPrice + deliveryFee;
-        //zmiana z getelementbyId bo nie mam pojęcia 
-        document.getElementById('delivery').innerHTML = deliveryFee;
       } else {
         thisCart.totalPrice = 0; // Jeśli koszyk jest pusty, cena całkowita to 0
-        document.getElementById('delivery').innerHTML = 0;
       }
-    
-      // Zaktualizowanie danych w HTML
-      thisCart.dom.totalNumber.innerHTML = totalNumber;
-    
-      // Zaktualizowanie subtotala nie działa
-      //thisCart.dom.subtotalPrice.innerHTML = subtotalPrice;
 
-    
-      // Zaktualizowanie kosztu dostawy nie działa
-      //  thisCart.dom.deliveryFee.innerHTML = deliveryFee;
-    
+      // Zaktualizowanie danych w HTML
+      thisCart.dom.totalNumber.innerHTML = totalNumber; // Aktualizacja liczby produktów
+
+      // Używamy getElementById, bo przy pomocy getElementsByClassName / querySelector były błędy
+      document.getElementById('subtotal').innerHTML = thisCart.subtotalPrice; // Subtotal price
+      document.getElementById('total').innerHTML = thisCart.totalPrice; // Total price
+      document.getElementById('delivery').innerHTML = thisCart.deliveryFee; // Delivery fee
+
       // Zaktualizowanie całkowitej ceny (TOTAL U GÓRY A NIE NA DOLE)
       for (const totalPriceElem of thisCart.dom.totalPrice) {
-        totalPriceElem.innerHTML = thisCart.totalPrice;
+          totalPriceElem.innerHTML = thisCart.totalPrice; // Aktualizacja ceny w innych miejscach
       }
-      
-      // zmiany z getelementbyId bo nie mam pojęcia 
-      document.getElementById('subtotal').innerHTML = subtotalPrice;
-      
-      document.getElementById('total').innerHTML = thisCart.totalPrice;
+
       console.log("Total number of products: " + totalNumber);
-      console.log("Subtotal price: " + subtotalPrice);
+      console.log("Subtotal price: " + thisCart.subtotalPrice);
       console.log("Total price: " + thisCart.totalPrice);
     }
-    
   }
 
   class CartProduct {
@@ -588,6 +639,18 @@
         thisCartProduct.remove();
       });
     }
+
+    getData(){
+      const thisCartProduct = this;
+      return {
+        id: thisCartProduct.id, // id produktu
+        amount: thisCartProduct.amount, // ilość
+        price: thisCartProduct.price, // cena za produkt
+        priceSingle: thisCartProduct.priceSingle, // cena jednostkowa
+        name: thisCartProduct.name, // nazwa produktu
+        params: thisCartProduct.params // parametry, np. kolory, rozmiary
+      };
+    }
   }
   const app = {
       
@@ -596,12 +659,27 @@
       //console.log('thisApp.data: ', thisApp.data);
 
       for(let productData in thisApp.data.products){
-        new Product(productData, thisApp.data.products[productData]);
+        new Product(thisApp.data.products[productData].id, thisApp.data.products[productData]);
       }
     },
     initData: function(){
       const thisApp = this;
-      thisApp.data = dataSource;
+      thisApp.data = {};
+      const url = settings.db.url + '/' + settings.db.products;
+      console.log(url);
+      fetch(url)
+          .then(function(rawResponse){
+            return rawResponse.json();
+          })
+          .then(function(parsedResponse){
+            console.log('parsedResponse: ', parsedResponse);
+            
+            thisApp.data.products = parsedResponse;
+
+
+            thisApp.initMenu();
+          });
+      console.log('thisApp.data: ', JSON.stringify(thisApp.data));
     },
     initCart: function(){
       const thisApp = this;
@@ -618,7 +696,6 @@
     //console.log('templates:', templates);
     
           thisApp.initData();
-          thisApp.initMenu();
           thisApp.initCart();
     },
     
