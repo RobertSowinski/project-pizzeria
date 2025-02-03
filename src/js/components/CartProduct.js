@@ -1,10 +1,11 @@
 import {select} from '../settings.js';
 import AmountWidget from './AmountWidget.js';
 
+
 class CartProduct {
   constructor(menuProduct, element) {
     const thisCartProduct = this;
-
+    
     // Przypisanie obiektu menuProduct do instancji thisCartProduct
     thisCartProduct.id = menuProduct.id;
     thisCartProduct.name = menuProduct.name;
@@ -22,7 +23,7 @@ class CartProduct {
     thisCartProduct.initActions();
 
     // Wyświetlenie instancji w konsoli
-    //console.log('New CartProduct:', thisCartProduct);
+    console.log('New CartProduct:', thisCartProduct);
   }
 
   getElements(element) {
