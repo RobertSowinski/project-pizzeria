@@ -171,7 +171,7 @@
           background: $color-dark;
           opacity: 0.4;
         }
-  
+        
       }
     }
   
@@ -197,4 +197,9 @@
   .booking-options {
     @include flex(row, flex-start, space-between);
     margin: ($base-size * 4) auto;
+  }
+  
+  .table.selected {
+    border: 3px solid #4CAF50;  // Zielona ramka
+    background: #C8E6C9;  // Jasnozielone tło
   }

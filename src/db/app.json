@@ -258,11 +258,11 @@
    "bookings": [
       {
          "id": 5,
-         "date": "2025-02-06",
-         "hour": "18:00",
-         "table": 2,
-         "repeat": "daily",
-         "duration": 2,
+         "date": "2025-02-07",
+         "hour": "15:00",
+         "table": 1,
+         "repeat": false,
+         "duration": 1,
          "ppl": 3,
          "starters": ["lemonWater"]
       }
