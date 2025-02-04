@@ -70,20 +70,20 @@ const app = {
     const thisApp = this;
     thisApp.data = {};
     const url = settings.db.url + '/' + settings.db.products;
-    console.log(url);
+    //console.log(url);
     fetch(url)
       .then(function(rawResponse){
         return rawResponse.json();
       })
       .then(function(parsedResponse){
-        console.log('parsedResponse: ', parsedResponse);
+        //console.log('parsedResponse: ', parsedResponse);
           
         thisApp.data.products = parsedResponse;
 
 
         thisApp.initMenu();
       });
-    console.log('thisApp.data: ', JSON.stringify(thisApp.data));
+    //console.log('thisApp.data: ', JSON.stringify(thisApp.data));
   },
   initCart: function(){
     const thisApp = this;

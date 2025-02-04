@@ -7,7 +7,7 @@ class AmountWidget extends BaseWidget{
 
     const thisWidget = this;
 
-    console.log('AmountWidget: ', thisWidget);
+    //console.log('AmountWidget: ', thisWidget);
     //console.log('Constructor arguments: ', element);
 
     thisWidget.getElements(element);

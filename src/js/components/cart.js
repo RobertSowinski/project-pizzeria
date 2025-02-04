@@ -174,9 +174,9 @@ class cart {
       totalPriceElem.innerHTML = thisCart.totalPrice; // Aktualizacja ceny w innych miejscach
     }
 
-    console.log('Total number of products: ' + totalNumber);
-    console.log('Subtotal price: ' + thisCart.subtotalPrice);
-    console.log('Total price: ' + thisCart.totalPrice);
+    //console.log('Total number of products: ' + totalNumber);
+    //console.log('Subtotal price: ' + thisCart.subtotalPrice);
+    //console.log('Total price: ' + thisCart.totalPrice);
   }
 }
 
