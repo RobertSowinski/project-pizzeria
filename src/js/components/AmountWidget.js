@@ -11,7 +11,8 @@ class AmountWidget extends BaseWidget{
     //console.log('Constructor arguments: ', element);
 
     thisWidget.getElements(element);
-    thisWidget.rendervalue();
+    thisWidget.setValue(thisWidget.value);
+    
 
     thisWidget.initActions();
   }
@@ -31,7 +32,7 @@ class AmountWidget extends BaseWidget{
      && value <= settings.amountWidget.defaultMax;
   }
 
-  rendervalue(){
+  renderValue(){
     const thisWidget = this;
 
     thisWidget.dom.input.value = thisWidget.value;

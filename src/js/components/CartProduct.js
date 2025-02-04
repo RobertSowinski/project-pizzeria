@@ -48,6 +48,8 @@ class CartProduct {
     // Tworzenie instancji AmountWidget
     thisCartProduct.amountWidget = new AmountWidget(thisCartProduct.dom.amountWidget);
 
+    thisCartProduct.amountWidget.setValue(thisCartProduct.amount);
+
     // Nasłuchiwacz zmiany wartości widgetu
     thisCartProduct.dom.amountWidget.addEventListener('updated', function () {
       // Aktualizacja wartości ilości

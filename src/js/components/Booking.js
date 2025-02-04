@@ -3,9 +3,12 @@ import utils from '../utils.js';
 import AmountWidget from './AmountWidget.js';
 import DatePicker from './DatePicker.js';
 import HourPicker from './HourPicker.js';
+
 class Booking {
   constructor(element) {
     const thisBooking = this;
+    
+    thisBooking.element = element;
     
     thisBooking.render(element); // Etap 1: Renderuj szablon
     thisBooking.initWidgets();   // Etap 2: Inicjalizuj widgety
@@ -64,7 +67,7 @@ class Booking {
         console.log(eventsRepeat);
       });
   }
-  render(element) {
+  render() {
     const thisBooking = this;
 
     // Generuj HTML z szablonu (bez danych)
@@ -74,7 +77,7 @@ class Booking {
     thisBooking.dom = {};
     
     // Przypisujemy kontener (wrapper) z argumentu
-    thisBooking.dom.wrapper = element;
+    thisBooking.dom.wrapper = thisBooking.element;
 
     // Zmieniamy zawartość wrappera na wygenerowany HTML
     thisBooking.dom.wrapper.innerHTML = generatedHTML;
@@ -85,8 +88,9 @@ class Booking {
 
     // Dodanie referencji do DatePicker i HourPicker
     thisBooking.dom.datePicker = thisBooking.dom.wrapper.querySelector(select.widgets.datePicker.wrapper);
+    console.log(thisBooking.dom.datePicker);
     thisBooking.dom.hourPicker = thisBooking.dom.wrapper.querySelector(select.widgets.hourPicker.wrapper);
-
+    console.log(thisBooking.dom.hourPicker);
   }
 
   initWidgets() {
