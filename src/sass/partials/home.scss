@@ -1,0 +1,189 @@
+* {
+     box-sizing: border-box; 
+}
+#home-wrapper {
+    padding: 36px 0;
+}
+.home-wrapper{
+    background-color: #ffffff;
+    padding: 72px 48px;
+    margin-top: 6px;
+}
+.home-information {
+    display: flex;
+    flex-wrap: wrap;
+    margin-top: 30px;
+    letter-spacing: 3px;
+    .box {
+        flex: 1 1 45%;
+        border-radius: 2%;
+        padding: 30px 0;
+    }
+    .order-online {
+        background-image: url('../../images/assets/pizza-1.jpg');
+        background-size: cover;
+    }
+    .book-table {
+        background-image: url('../../images/assets/pizza-2.jpg');
+        background-size: cover;
+    }
+    .order-online, .book-table {
+        color: #ffffff;
+        font-size: 13px;
+        margin: 0 3px;
+        position: relative;
+        h1 {
+            font-size: 20px;
+            text-align: center;
+            font-weight: bold;
+            letter-spacing: 0.5px;
+            transition: opacity 0.5s, transform 0.5s;
+        }
+        .hidden-text {
+            font-size: 10px;
+            position: absolute;
+            white-space: nowrap;
+            left: 50%;
+            bottom: 50px;
+            opacity: 0;
+            transform: translateX(-50%) translateY(-50%);
+            transition: opacity 0.5s, transform 0.5s;
+        }
+        &:hover h1 {
+            transform: translateY(-30px);
+            transition: transform 1;
+        }
+        &:hover .hidden-text {
+            opacity: 1;
+            transform: translateX(-50%) translateY(50%);
+        }
+    }
+    .opening-hour {
+        width: 100%;
+        padding: 25px;
+        margin-top: 10px;
+        background-color: #ff6b6b;
+        color: #ffffff;
+        font-size: 20px;
+        letter-spacing: 0.5px;
+        font-weight: 900;
+        text-align: center;
+        span {
+            display: block;
+            font-size: 15px;
+            font-weight: 300;
+            margin-top: 10px;
+        }
+    }
+}
+.carousel {
+    margin-top: 100px;
+    width: 100%;
+}
+.carousel-cell {
+    display: flex;
+    width: 100%;
+    .carousel-image {
+        flex: 1;
+        img {
+            width: 100%;
+            height: 100%;
+            border-radius: 2%;
+            object-fit: cover;
+        }
+    }
+    .carousel-text {
+        flex: 2;
+        text-align: left;
+        padding-left: 15px;
+        span{
+            margin-top: 15px;
+        }
+    }
+}
+.gallery {
+  width: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 100px;
+  .gallery-item {
+    position: relative;
+    overflow: hidden;
+    flex: 1 1 calc(33.33% - 10px); // Domyślnie 3 w rzędzie
+    @media (max-width: 1023px) {
+      flex: 1 1 calc(50% - 10px); // Tablety: 2 w rzędzie
+    }
+    @media (max-width: 767px) {
+      flex: 1 1 100%; // Telefon: 1 na pełną szerokość
+    }
+  }
+}
+// musiałem przenieść bo nie może być nesting more than 3  normalnie byłoby w lini 121
+.gallery-item-image {
+  position: relative;
+  width: 100%;
+  height: 200px;
+  border-radius: 3%;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 3%;
+    transition: filter 0.3s ease-in-out;
+  }
+  // Ciemniejsze tło przy najechaniu
+  &::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.4);
+    opacity: 0;
+    transition: opacity 0.3s ease-in-out;
+    border-radius: 3%;
+  }
+  // Ikony FontAwesome
+  i {
+    position: absolute;
+    color: #ffffff;
+    font-size: 24px;
+    opacity: 0;
+    transition: opacity 0.3s ease-in-out, color 0.3s ease-in-out;
+    z-index: 2; // Ikony nad obrazkiem
+    &.fa-heart {
+      transform: translateX(-50%);
+      margin-right: 15px;
+    }
+    &.fa-share-nodes {
+      transform: translateX(50%);
+      margin-left: 15px;
+    }
+  }  
+  &:hover {
+    &::after {
+      opacity: 1; // Ciemniejsze tło
+    }  
+    i {
+      opacity: 1; // Pokazanie ikon
+    }
+  }
+  // Efekt zmiany koloru ikony po najechaniu
+  i:hover {
+    color: #ff6b6b;
+  }
+}
+.instagram{
+    margin-top: 20px;
+    a{
+        color: #ff6b6b;
+    }
+}
+  

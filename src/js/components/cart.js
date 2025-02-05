@@ -25,7 +25,7 @@ class cart {
     thisCart.dom.deliveryFee = thisCart.dom.wrapper.querySelector(select.cart.deliveryFee);
     thisCart.dom.subtotalPrice = thisCart.dom.wrapper.querySelector(select.cart.subtotalPrice);
     thisCart.dom.totalPrice = thisCart.dom.wrapper.querySelectorAll(select.cart.totalPrice);
-    thisCart.dom.totalNumber = thisCart.dom.wrapper.querySelector(`.${select.cart.totalNumber}`);
+    thisCart.dom.totalNumber = thisCart.dom.wrapper.querySelector(select.cart.totalNumber);
     thisCart.dom.form = thisCart.dom.wrapper.querySelector(select.cart.form);
     thisCart.dom.address = thisCart.dom.form.querySelector(select.cart.address);
     thisCart.dom.phone = thisCart.dom.form.querySelector(select.cart.phone);
@@ -139,35 +139,33 @@ class cart {
   update() {
     const thisCart = this;
   
-    let deliveryFee = settings.cart.defaultDeliveryFee;
-    let totalNumber = 0;
-    let subtotalPrice = 0;
+    const deliveryFee=settings.cart.defaultDeliveryFee;
+    thisCart.totalNumber=0;
+    thisCart.subtotalPrice=0;
   
     // Przejście po wszystkich produktach w koszyku
-    for (const product of thisCart.products) {
-      totalNumber += product.amount;
-      subtotalPrice += product.price;
+    for (let product of thisCart.products) {
+      thisCart.totalNumber+=product.amountWidget.value;
+      thisCart.subtotalPrice+=product.price;
     }
 
-    // Zapisanie nowych wartości do obiektu thisCart
-    thisCart.totalNumber = totalNumber; // Zapisanie totalNumber
-    thisCart.subtotalPrice = subtotalPrice; // Zapisanie subtotalPrice
-    thisCart.deliveryFee = totalNumber > 0 ? deliveryFee : 0; // Zapisanie deliveryFee, jeśli są produkty
-    
-    // Obliczanie całkowitej ceny
-    if (totalNumber > 0) {
-      thisCart.totalPrice = subtotalPrice + deliveryFee;
-    } else {
-      thisCart.totalPrice = 0; // Jeśli koszyk jest pusty, cena całkowita to 0
+    if(thisCart.totalNumber>0){
+      thisCart.totalPrice=thisCart.subtotalPrice+deliveryFee;
+      thisCart.deliveryFee=20;
+    }else{
+      thisCart.totalPrice=0;
+      thisCart.deliveryFee=0;
     }
 
     // Zaktualizowanie danych w HTML
-    thisCart.dom.totalNumber.innerHTML = totalNumber; // Aktualizacja liczby produktów
-
+    thisCart.dom.totalNumber.innerHTML = thisCart.totalNumber; // Aktualizacja liczby produktów
+    thisCart.dom.subtotalPrice.innerHTML = thisCart.subtotalPrice;
+    thisCart.dom.deliveryFee.innerHTML = thisCart.deliveryFee;
+    thisCart.dom.totalPrice.innerHTML = thisCart.deliveryFee;
     // Używamy getElementById, bo przy pomocy getElementsByClassName / querySelector były błędy
-    document.getElementById('subtotal').innerHTML = thisCart.subtotalPrice; // Subtotal price
-    document.getElementById('total').innerHTML = thisCart.totalPrice; // Total price
-    document.getElementById('delivery').innerHTML = thisCart.deliveryFee; // Delivery fee
+    // document.getElementById('subtotal').innerHTML = thisCart.subtotalPrice; // Subtotal price
+    // document.getElementById('total').innerHTML = thisCart.totalPrice; // Total price
+    // document.getElementById('delivery').innerHTML = thisCart.deliveryFee; // Delivery fee
 
     // Zaktualizowanie całkowitej ceny (TOTAL U GÓRY A NIE NA DOLE)
     for (const totalPriceElem of thisCart.dom.totalPrice) {

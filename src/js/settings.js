@@ -3,12 +3,14 @@ export const select = {
     menuProduct: '#template-menu-product',
     CartProduct: '#template-cart-product',
     bookingWidget: '#template-booking-widget',
+    homePage:'#template-home-page',
   },
   containerOf: {
     menu: '#product-list',
     cart: '#cart',
     pages: '#pages',
     booking: '.booking-wrapper',
+    home:'#home-wrapper',
   },
   all: {
     menuProducts: '#product-list > .product',
@@ -22,6 +24,9 @@ export const select = {
     imageWrapper: '.product__images',
     amountWidget: '.widget-amount',
     cartButton: '[href="#add-to-cart"]',
+  },
+  home: {
+    carousel: '.carousel',
   },
   widgets: {
     amount: {
@@ -58,7 +63,7 @@ export const select = {
   cart:{
     productList: '.cart__order-summary',
     toggleTrigger: '.cart__summary',
-    totalNumber: 'cart__total-number',
+    totalNumber: '.cart__total-number',
     totalPrice: '.cart__total-price strong, .cart__order-total .cart__order-price-sum strong',
     subtotalPrice: '.cart__order-subtotal .cart__order-price-sum strong',
     deliveryFee: '.cart__order-delivery .cart__order-price-sum strong',
@@ -132,4 +137,5 @@ export const templates = {
   menuProduct: Handlebars.compile(document.querySelector(select.templateOf.menuProduct).innerHTML),
   cartProduct: Handlebars.compile(document.querySelector(select.templateOf.CartProduct).innerHTML),
   bookingWidget: Handlebars.compile(document.querySelector(select.templateOf.bookingWidget).innerHTML),
+  homePage: Handlebars.compile(document.querySelector(select.templateOf.homePage).innerHTML),
 };
